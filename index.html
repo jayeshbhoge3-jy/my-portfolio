@@ -1,0 +1,1434 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jayesh Bhoge — Full Stack Developer & DevOps Enthusiast</title>
+  <meta name="description" content="Portfolio of Jayesh Bhoge — Full Stack Developer, DevOps Enthusiast. React, Node.js, Flask, Docker." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2300d4ff'/><text x='16' y='22' text-anchor='middle' fill='%23000000' font-size='18' font-weight='bold' font-family='sans-serif'>JB</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  
+  <!-- THREE.JS LIBRARY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@400;700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    /* The body is transparent so the 3D Canvas shines through */
+    body {
+      background: transparent;
+      color: white;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #030818; }
+    ::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0099cc; }
+
+    ::selection { background: rgba(0,212,255,0.3); }
+
+    /* ── 3D CANVAS BACKGROUND ── */
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -1;
+      /* Notice: No pointer-events:none here so we CAN drag the scene! */
+    }
+
+    /* ── PASS-THROUGH CLICKS TO 3D BACKGROUND ── */
+    /* We make large containers pass clicks through to the 3D canvas so you can drag the island anywhere */
+    main, section, #home { pointer-events: none; }
+    /* Re-enable clicks strictly on the content blocks */
+    .hero-heading, .hi-text, .about-card, .section-title, .project-card, .journey-card, .skill-card, .contact-grid, nav, .social-icons, footer { 
+      pointer-events: auto; 
+    }
+
+    /* ── SOCIAL ICONS ── */
+    .social-icons {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .social-icons a {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: white; text-decoration: none;
+      backdrop-filter: blur(5px);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .social-icons a:hover {
+      background: rgba(0,212,255,0.3);
+      transform: scale(1.15);
+    }
+    .social-icons a svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(3, 8, 24, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 0 2rem;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo .logo-box {
+      width: 32px; height: 32px;
+      background: white;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 15px;
+      color: #000;
+    }
+    .nav-logo span {
+      font-weight: 700;
+      font-size: 16px;
+      color: white;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: white;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover {
+      color: #00d4ff;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 26px;
+      height: 2px;
+      background: white;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem;
+    }
+
+    /* ── HERO ── */
+    #home {
+      min-height: 100vh;
+      padding-top: 100px;
+      padding-bottom: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+    }
+    .drag-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Orbitron', sans-serif;
+      color: #00d4ff;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      animation: pulseHint 2s infinite;
+      pointer-events: none;
+      text-shadow: 0 0 10px rgba(0,212,255,0.5);
+    }
+    
+    @keyframes pulseHint {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; text-shadow: 0 0 15px #00d4ff; }
+    }
+
+    @keyframes heroFadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hi-text {
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 4px;
+      color: #00d4ff; 
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      text-shadow: 0px 2px 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,212,255,0.5); 
+      animation: heroFadeIn 1.2s ease 0.2s both; 
+    }
+    
+    .hero-heading {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 900;
+      color: white;
+      text-align: center;
+      line-height: 1.2;
+      text-shadow: 0 0 40px rgba(0,212,255,0.4), 0 0 80px rgba(0,212,255,0.2);
+      margin: 0;
+      animation: heroFadeIn 1.5s ease 0.4s both;
+    }
+
+    .about-card {
+      background: rgba(10, 15, 35, 0.5); 
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-left: 4px solid #00d4ff;
+      border-radius: 8px;
+      padding: 2rem 2.5rem;
+      max-width: 700px;
+      width: 90%;
+      margin-top: 4rem;
+      animation: heroFadeIn 1.5s ease 0.6s both;
+    }
+    
+    .about-card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 1rem;
+      color: white;
+    }
+    .about-card p {
+      color: rgba(255,255,255,0.9);
+      line-height: 1.8;
+      margin: 0.5rem 0;
+      font-size: 0.97rem;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .section-title-projects {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 3px #f5a623;
+      text-align: center;
+      letter-spacing: 8px;
+      background: linear-gradient(180deg, #f5a623 0%, #e8890a 50%, #b85e00 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-title-journey {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 2px #00d4ff;
+      text-align: center;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    .section-title-skills {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 2px #4ecdc4;
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      font-style: italic;
+    }
+    .section-title-contact {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 2px #e85d75;
+      text-align: center;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+    }
+
+    /* ── PROJECTS ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .project-card {
+      position: relative;
+      height: 520px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .project-card .card-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      transition: transform 0.6s ease;
+      filter: brightness(0.4);
+    }
+    .project-card:hover .card-bg {
+      transform: scale(1.08);
+      filter: brightness(0.6);
+    }
+    .project-card .card-content {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 2rem;
+      background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 60%, rgba(0,0,0,0.7) 100%);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .project-card h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+    }
+    .project-card .period {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 1rem;
+    }
+    .project-card p {
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      flex: 1;
+    }
+    .project-card .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+    .project-card .tag {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #00d4ff;
+      color: #00d4ff;
+      background: rgba(0,212,255,0.1);
+    }
+    .project-card .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 0.8rem;
+      padding: 6px 16px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+    .project-card .github-link:hover {
+      background: #00d4ff;
+      border-color: #00d4ff;
+      color: #000;
+    }
+    .project-card .github-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* ── JOURNEY CARDS ── */
+    .journey-card {
+      background: rgba(10, 20, 45, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-left: 4px solid #00d4ff;
+      border-radius: 6px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 920px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: border-left-color 0.3s, transform 0.3s, background 0.3s;
+    }
+    .journey-card:hover {
+      border-left-color: #f5a623;
+      transform: translateX(5px);
+      background: rgba(10, 20, 45, 0.8);
+    }
+    .journey-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 0.4rem;
+    }
+    .journey-card .date {
+      color: #00d4ff;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .journey-card p {
+      color: rgba(255,255,255,0.85);
+      line-height: 1.8;
+      font-size: 0.93rem;
+    }
+    .journey-card strong {
+      color: white;
+    }
+
+    /* ── SKILLS ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      max-width: 950px;
+      margin: 0 auto;
+    }
+    .skill-card {
+      background: rgba(10, 20, 45, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 10px;
+      padding: 2rem;
+    }
+    .skill-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      text-align: center;
+      margin: 0 0 1.5rem;
+      letter-spacing: 1px;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .skill-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid rgba(0,212,255,0.4);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      background: rgba(0,212,255,0.07);
+      transition: background 0.2s, border-color 0.2s;
+      cursor: default;
+    }
+    .skill-pill:hover {
+      background: rgba(0,212,255,0.2);
+      border-color: #00d4ff;
+    }
+    .skill-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #00d4ff;
+      flex-shrink: 0;
+    }
+
+    /* ── CONTACT ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      max-width: 950px;
+      margin: 0 auto;
+      background: rgba(10, 20, 45, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 3rem;
+    }
+    .contact-left h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .contact-left .sub {
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 1.5rem;
+    }
+    .social-row {
+      display: flex;
+      gap: 12px;
+    }
+    .social-row a {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .social-row a:hover {
+      background: #00d4ff;
+      border-color: #00d4ff;
+      color: #000;
+      transform: translateY(-3px);
+    }
+    .social-row a svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    .contact-left .email-note {
+      margin-top: 1.5rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .contact-left .email-btn {
+      margin-top: 0.8rem;
+      padding: 0.8rem 1.5rem;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s, border-color 0.3s;
+      width: 100%;
+      max-width: 300px;
+      font-family: inherit;
+    }
+    .contact-left .email-btn:hover {
+      background: rgba(0,212,255,0.1);
+      border-color: #00d4ff;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      color: white;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.3s, background 0.3s;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: #00d4ff;
+      background: rgba(0,212,255,0.05);
+    }
+    .contact-form textarea {
+      height: 120px;
+      resize: vertical;
+    }
+    .contact-form label {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .submit-btn {
+      background: transparent;
+      border: 2px solid #00d4ff;
+      color: #00d4ff;
+      padding: 0.9rem 2.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+    }
+    .submit-btn:hover {
+      background: #00d4ff;
+      color: #000;
+      transform: translateY(-2px);
+    }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .animate-on-scroll:nth-child(2) { transition-delay: 0.15s; }
+    .animate-on-scroll:nth-child(3) { transition-delay: 0.3s; }
+    .animate-on-scroll:nth-child(4) { transition-delay: 0.45s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 1rem; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.95);
+        backdrop-filter: blur(12px);
+        flex-direction: column;
+        padding: 1.5rem 2rem;
+        gap: 1.2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card { height: 400px; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; padding: 2rem; }
+      .hero-heading { font-size: 2.2rem; }
+      .section-title-projects { font-size: 3rem; }
+      .social-icons { display: none; }
+      section { padding: 4rem 1rem; }
+    }
+
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+    }
+    footer span { color: #00d4ff; }
+  </style>
+</head>
+<body>
+
+  <!-- VERY IMPORTANT: The new 3D Background Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Fixed Social Icons -->
+  <div class="social-icons">
+    <a href="https://github.com/jayesh-bhoge" target="_blank" rel="noopener" aria-label="GitHub">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+    </a>
+    <a href="https://linkedin.com/in/jayesh-bhoge" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <a href="https://instagram.com/jayesh_bhoge" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <a href="mailto:bhogejayesh@gmail.com" aria-label="Email">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    </a>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <a href="#home" class="nav-logo">
+      <div class="logo-box">JB</div>
+      <span>Jayesh Bhoge</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#journey">Journey So Far</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- Hero -->
+    <section id="home">
+      <p class="hi-text">Hi! I'm JAYESH BHOGE — Software Developer</p>
+      <h1 class="hero-heading">A Full Stack Developer<br />&amp; DevOps Enthusiast</h1>
+      <div class="about-card animate-on-scroll">
+        <h2>About Me</h2>
+        <p>
+          Hey, I'm <strong>Jayesh Bhoge</strong> – a <strong>Full Stack Developer</strong> who turns <em>chai into code</em> and <em>ideas into reality!</em> ☕💡
+        </p>
+        <p>
+          I specialize in <strong>React, Node.js, Flask, Docker, and DevOps workflows</strong>. Whether it's building REST APIs, containerizing apps, or deploying to cloud, I love making tech work efficiently.
+        </p>
+        <p>
+          👀 Check out my work &amp; hit me up if you wanna build something awesome together! 🚀
+        </p>
+      </div>
+      <div class="drag-hint">✨ Drag anywhere to rotate the 3D World! ✨</div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects">
+      <div class="section-title section-title-projects">PROJECTS</div>
+      <div class="projects-grid">
+        <div class="project-card animate-on-scroll">
+          <div class="card-bg" style="background: linear-gradient(180deg, rgba(10,25,50,0.3) 0%, rgba(3,8,24,0.9) 100%), url('https://images.unsplash.com/photo-1555949963-aa79dcee57d5?auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+          <div class="card-content">
+            <h3>Smart Surveillance for Missing Child</h3>
+            <div class="period">Dec 2024 – May 2025</div>
+            <p>AI-powered missing child identification system using CNN and Multiclass SVM. Flutter mobile app connected to Flask REST API with face recognition and real-time Appwrite storage. Containerized with Docker.</p>
+            <div class="tags">
+              <span class="tag">Python</span>
+              <span class="tag">CNN</span>
+              <span class="tag">Flask</span>
+              <span class="tag">Flutter</span>
+              <span class="tag">Appwrite</span>
+              <span class="tag">Docker</span>
+            </div>
+            <a href="https://github.com/jayesh-bhoge" target="_blank" rel="noopener" class="github-link">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+        <div class="project-card animate-on-scroll">
+          <div class="card-bg" style="background: linear-gradient(180deg, rgba(10,25,50,0.3) 0%, rgba(3,8,24,0.9) 100%), url('https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+          <div class="card-content">
+            <h3>AlgoVisualizer</h3>
+            <div class="period">May 2024 – Nov 2024</div>
+            <p>Interactive tool to visualize sorting and pathfinding algorithms in real time using C++ and SFML. Implements QuickSort, MergeSort, Dijkstra, and A* with dynamic animations and performance tracking.</p>
+            <div class="tags">
+              <span class="tag">C++</span>
+              <span class="tag">SFML</span>
+              <span class="tag">OOP</span>
+              <span class="tag">Data Structures</span>
+            </div>
+            <a href="https://github.com/jayesh-bhoge" target="_blank" rel="noopener" class="github-link">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+        <div class="project-card animate-on-scroll">
+          <div class="card-bg" style="background: linear-gradient(180deg, rgba(10,25,50,0.3) 0%, rgba(3,8,24,0.9) 100%), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+          <div class="card-content">
+            <h3>TaskFlow</h3>
+            <div class="period">May 2024 – Aug 2024</div>
+            <p>Task management web app with JWT authentication, role-based access control (admin/user), REST APIs using Node.js and Express, and data management with MongoDB Atlas. Containerized with Docker.</p>
+            <div class="tags">
+              <span class="tag">MERN Stack</span>
+              <span class="tag">JWT</span>
+              <span class="tag">Redux</span>
+              <span class="tag">REST API</span>
+              <span class="tag">Docker</span>
+            </div>
+            <a href="https://github.com/jayesh-bhoge" target="_blank" rel="noopener" class="github-link">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Journey So Far -->
+    <section id="journey">
+      <div class="section-title section-title-journey">JOURNEY SO FAR</div>
+      <div class="journey-card animate-on-scroll">
+        <h3>Software Developer, Creative Web Solution</h3>
+        <div class="date">Sep 2025 – Present | Pune, India</div>
+        <p>
+          Developed and maintained responsive web apps using React, HTML, CSS, JavaScript. Built full-stack applications using <strong>Flask, React, PostgreSQL, and Docker</strong> 🐳. Collaborated to deploy <strong>2 production applications</strong> using Docker-based containerization. Gained hands-on exposure to deployment workflows, environment setup, debugging, and basic <strong>cloud infrastructure</strong> ☁️.
+        </p>
+      </div>
+      <div class="journey-card animate-on-scroll">
+        <h3>Software Engineering Virtual Intern, Accenture</h3>
+        <div class="date">Jun 2025 – Aug 2025 | Pune, India</div>
+        <p>
+          Completed the <strong>Accenture Software Engineering Virtual Experience</strong> on Forage 🏆. Designed and implemented a <strong>data-driven business solution</strong> to improve efficiency. Gained practical exposure to <strong>Agile methodology</strong> ⚡ and collaborative project work. Strengthened skills in SDLC and professional communication.
+        </p>
+      </div>
+      <div class="journey-card animate-on-scroll">
+        <h3>B.E. Computer Science, MMIT Pune</h3>
+        <div class="date">Dec 2021 – July 2025</div>
+        <p>
+          Completed Bachelor's in Computer Science and Engineering with <strong>CGPA: 7.44</strong> 🎓. Coursework included Data Structures &amp; Algorithms, DBMS, OOP, Computer Networks.
+        </p>
+      </div>
+      <div class="journey-card animate-on-scroll">
+        <h3>HSC, KTHM College</h3>
+        <div class="date">July 2020 – July 2021</div>
+        <p>
+          Completed Higher Secondary with outstanding <strong>CGPA: 9.07</strong> 🌟.
+        </p>
+      </div>
+    </section>
+
+    <!-- Weapons in my Bag -->
+    <section id="skills">
+      <div class="section-title section-title-skills">Weapons in my Bag</div>
+      <div class="skills-grid">
+        <div class="skill-card animate-on-scroll">
+          <h3>Languages</h3>
+          <div class="skill-pills">
+            <span class="skill-pill"><span class="dot"></span>C/C++</span>
+            <span class="skill-pill"><span class="dot"></span>JavaScript</span>
+            <span class="skill-pill"><span class="dot"></span>Python</span>
+            <span class="skill-pill"><span class="dot"></span>SQL (PostgreSQL)</span>
+            <span class="skill-pill"><span class="dot"></span>Java</span>
+            <span class="skill-pill"><span class="dot"></span>HTML</span>
+            <span class="skill-pill"><span class="dot"></span>CSS</span>
+          </div>
+        </div>
+        <div class="skill-card animate-on-scroll">
+          <h3>Frameworks</h3>
+          <div class="skill-pills">
+            <span class="skill-pill"><span class="dot"></span>React</span>
+            <span class="skill-pill"><span class="dot"></span>Node.js</span>
+            <span class="skill-pill"><span class="dot"></span>Express.js</span>
+            <span class="skill-pill"><span class="dot"></span>Flask</span>
+            <span class="skill-pill"><span class="dot"></span>Django</span>
+            <span class="skill-pill"><span class="dot"></span>Next.js</span>
+            <span class="skill-pill"><span class="dot"></span>TypeScript</span>
+          </div>
+        </div>
+        <div class="skill-card animate-on-scroll">
+          <h3>DevOps &amp; Tools</h3>
+          <div class="skill-pills">
+            <span class="skill-pill"><span class="dot"></span>Docker</span>
+            <span class="skill-pill"><span class="dot"></span>Kubernetes (Basic)</span>
+            <span class="skill-pill"><span class="dot"></span>Terraform (Basic)</span>
+            <span class="skill-pill"><span class="dot"></span>Git</span>
+            <span class="skill-pill"><span class="dot"></span>GitHub</span>
+            <span class="skill-pill"><span class="dot"></span>GitLab</span>
+            <span class="skill-pill"><span class="dot"></span>Linux</span>
+          </div>
+        </div>
+        <div class="skill-card animate-on-scroll">
+          <h3>Cloud &amp; CI/CD</h3>
+          <div class="skill-pills">
+            <span class="skill-pill"><span class="dot"></span>AWS Fundamentals</span>
+            <span class="skill-pill"><span class="dot"></span>Azure Fundamentals</span>
+            <span class="skill-pill"><span class="dot"></span>CI/CD Pipelines</span>
+            <span class="skill-pill"><span class="dot"></span>VMs &amp; Networking</span>
+            <span class="skill-pill"><span class="dot"></span>REST APIs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+      <div class="section-title section-title-contact">CONTACT ME</div>
+      <div class="contact-grid">
+        <div class="contact-left animate-on-scroll">
+          <h3>Say Hi!</h3>
+          <p class="sub">You can connect to me using these social media.</p>
+          <div class="social-row">
+            <a href="https://linkedin.com/in/jayesh-bhoge" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/jayesh-bhoge" target="_blank" rel="noopener" aria-label="GitHub">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+            <a href="https://instagram.com/jayesh_bhoge" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href="mailto:bhogejayesh@gmail.com" aria-label="Email">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </a>
+          </div>
+          <p class="email-note">Or you can drop me a mail at (click to copy):</p>
+          <button class="email-btn" id="emailBtn">bhogejayesh@gmail.com</button>
+        </div>
+        <div class="animate-on-scroll">
+          <!-- Added action and method attributes for Formspree -->
+          <form class="contact-form" id="contactForm" action="https://formspree.io/f/mwvzwjja" method="POST">
+            <label for="formName">Name*</label>
+            <input type="text" id="formName" name="name" required />
+
+            <label for="formEmail">Email*</label>
+            <input type="email" id="formEmail" name="email" required />
+
+            <label for="formMessage">Leave a message*</label>
+            <textarea id="formMessage" name="message" required></textarea>
+
+            <button type="submit" class="submit-btn">Submit</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© 2025 <span>Jayesh Bhoge</span> — Built with ☕, React &amp; DevOps</p>
+  </footer>
+
+  <script>
+    // ── 1. PROCEDURAL 3D EARTH & GALAXY (THREE.JS) ──
+    (function initEarthAndGalaxy() {
+      const canvas = document.getElementById('bgCanvas');
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x030818, 100, 2500); // Linear fog pushed far back to reveal the solar system
+
+      // Setup Camera
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+      camera.position.set(0, 0, 35);
+
+      // Setup Renderer
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x030818, 1);
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+      scene.add(ambientLight);
+      const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      sunLight.position.set(15, 10, 10);
+      scene.add(sunLight);
+      const blueLight = new THREE.PointLight(0x00d4ff, 2, 100);
+      blueLight.position.set(-15, -10, -10);
+      scene.add(blueLight);
+
+      // ==========================================
+      // HELPER: PLANET LABELS & ORBIT LINES
+      // ==========================================
+      function createPlanetLabel(text, color) {
+        const lblCanvas = document.createElement('canvas');
+        const context = lblCanvas.getContext('2d');
+        lblCanvas.width = 512; lblCanvas.height = 128;
+        context.font = "900 36px 'Orbitron', sans-serif";
+        context.fillStyle = color;
+        context.textAlign = "center";
+        context.shadowColor = color; context.shadowBlur = 15;
+        context.fillText(text, 256, 80);
+        
+        const texture = new THREE.CanvasTexture(lblCanvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, blending: THREE.AdditiveBlending });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(30, 7.5, 1); 
+        return sprite;
+      }
+
+      const orbitMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08 });
+      function createOrbitLine(radius, yPos) {
+          const points = [];
+          for (let i = 0; i <= 64; i++) {
+              const angle = (i / 64) * Math.PI * 2;
+              points.push(new THREE.Vector3(Math.cos(angle) * radius, yPos, Math.sin(angle) * radius));
+          }
+          const geo = new THREE.BufferGeometry().setFromPoints(points);
+          return new THREE.Line(geo, orbitMat);
+      }
+
+      // ==========================================
+      // BUILD SOLAR SYSTEM - DYNAMIC PIVOTS
+      // ==========================================
+      const solarSystem = new THREE.Group();
+      solarSystem.position.set(0, -30, -1200); // Placed deep into the screen
+      scene.add(solarSystem);
+
+      // --- EARTH ---
+      const earthOrbit = new THREE.Group();
+      solarSystem.add(earthOrbit);
+      solarSystem.add(createOrbitLine(1200, 30)); // Earth orbit track
+
+      const earthGroup = new THREE.Group();
+      earthGroup.position.set(0, 30, 1200); // Relative to solarSystem (Places it at global 0,0,0)
+      earthOrbit.add(earthGroup);
+
+      const textureLoader = new THREE.TextureLoader();
+      const earthGeo = new THREE.SphereGeometry(12, 64, 64);
+      const earthMat = new THREE.MeshPhongMaterial({
+        map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
+        bumpMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
+        bumpScale: 0.3,
+        specularMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
+        specular: new THREE.Color('grey'),
+        shininess: 15
+      });
+      const earth = new THREE.Mesh(earthGeo, earthMat);
+      earthGroup.rotation.z = 23.5 * Math.PI / 180;
+      earthGroup.add(earth);
+
+      const atmosGeo = new THREE.SphereGeometry(12.4, 64, 64);
+      const atmosMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, side: THREE.BackSide });
+      earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
+      
+      // Changed Earth label color to white to contrast with your cyan name!
+      const earthLabel = createPlanetLabel("EARTH", "#ffffff");
+      earthLabel.position.set(0, 16, 0);
+      earthGroup.add(earthLabel);
+
+      // --- MOON ---
+      const moonOrbit = new THREE.Group();
+      earthGroup.add(moonOrbit); // Moon orbits the Earth
+      
+      const moonGeo = new THREE.SphereGeometry(2.5, 32, 32);
+      const moonMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.8, metalness: 0.1 });
+      const moon = new THREE.Mesh(moonGeo, moonMat);
+      moon.position.set(22, 0, 0); // Distance from Earth
+      moonOrbit.add(moon);
+      
+      const moonLine = createOrbitLine(22, 0);
+      moonOrbit.add(moonLine);
+
+      // --- SATELLITE (Orbits Earth) ---
+      const satelliteOrbitGroup = new THREE.Group();
+      satelliteOrbitGroup.rotation.z = 0.5;
+      earthGroup.add(satelliteOrbitGroup); // Attached to Earth!
+
+      const satellite = new THREE.Group();
+      satellite.position.set(16, 0, 0);
+      const satBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 1.5), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 }));
+      satellite.add(satBody);
+      const panelMat = new THREE.MeshStandardMaterial({ color: 0x0a1128, metalness: 0.9, roughness: 0.4 });
+      const panelRight = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.05, 1.2), panelMat); panelRight.position.set(2.1, 0, 0); satellite.add(panelRight);
+      const panelLeft = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.05, 1.2), panelMat); panelLeft.position.set(-2.1, 0, 0); satellite.add(panelLeft);
+      const dishMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.5 });
+      const dish = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.4, 16), dishMat); dish.position.set(0, 0, 0.9); dish.rotation.x = Math.PI / 2; satellite.add(dish);
+      const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1), dishMat); antenna.position.set(0, 0.5, 0); satellite.add(antenna);
+      satelliteOrbitGroup.add(satellite);
+
+      // --- MARS ---
+      const marsOrbit = new THREE.Group();
+      solarSystem.add(marsOrbit);
+      solarSystem.add(createOrbitLine(Math.hypot(-40, 1050), 30));
+
+      const marsGeo = new THREE.SphereGeometry(4, 32, 32);
+      const marsMat = new THREE.MeshStandardMaterial({ color: 0xd14924, roughness: 0.8, metalness: 0.2 });
+      const mars = new THREE.Mesh(marsGeo, marsMat);
+      mars.position.set(-40, 30, 1050); // Relative to solarSystem
+      const marsLabel = createPlanetLabel("MARS", "#ff5533");
+      marsLabel.position.set(0, 7, 0);
+      mars.add(marsLabel);
+      marsOrbit.add(mars);
+
+      // --- JUPITER ---
+      const jupOrbit = new THREE.Group();
+      solarSystem.add(jupOrbit);
+      solarSystem.add(createOrbitLine(Math.hypot(50, 850), 30));
+
+      const jupGeo = new THREE.SphereGeometry(18, 64, 64);
+      const jupMat = new THREE.MeshStandardMaterial({ color: 0xc88b3a, roughness: 0.7 });
+      const jupiter = new THREE.Mesh(jupGeo, jupMat);
+      jupiter.position.set(50, 30, 850);
+      const jupLabel = createPlanetLabel("JUPITER", "#ffaa55");
+      jupLabel.position.set(0, 24, 0);
+      jupiter.add(jupLabel);
+      jupOrbit.add(jupiter);
+
+      // --- SATURN ---
+      const satOrbit = new THREE.Group();
+      solarSystem.add(satOrbit);
+      solarSystem.add(createOrbitLine(Math.hypot(-60, 600), 30));
+
+      const satGroup = new THREE.Group();
+      satGroup.position.set(-60, 30, 600);
+      satGroup.rotation.z = -0.2; satGroup.rotation.x = 0.1;
+
+      const satGeo = new THREE.SphereGeometry(12, 64, 64);
+      const satMat = new THREE.MeshStandardMaterial({ color: 0xeaddb9, roughness: 0.6 });
+      const saturn = new THREE.Mesh(satGeo, satMat);
+      satGroup.add(saturn);
+      const ringMat = new THREE.MeshStandardMaterial({ color: 0xa69279, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+      const ring = new THREE.Mesh(new THREE.RingGeometry(18, 28, 64), ringMat);
+      ring.rotation.x = Math.PI / 2 + 0.2; 
+      satGroup.add(ring);
+      const satLabel = createPlanetLabel("SATURN", "#eaddb9");
+      satLabel.position.set(0, 18, 0);
+      satGroup.add(satLabel);
+      satOrbit.add(satGroup);
+
+      // --- SUN ---
+      const sun = new THREE.Group();
+      sun.position.set(0, 0, 0); // Center of solarSystem
+      const sunCore = new THREE.Mesh(new THREE.SphereGeometry(120, 64, 64), new THREE.MeshBasicMaterial({ color: 0xffffee })); 
+      sun.add(sunCore);
+      const corona1 = new THREE.Mesh(new THREE.SphereGeometry(126, 64, 64), new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }));
+      sun.add(corona1);
+      const corona2 = new THREE.Mesh(new THREE.SphereGeometry(145, 64, 64), new THREE.MeshBasicMaterial({ color: 0xff3300, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, side: THREE.BackSide }));
+      sun.add(corona2);
+      const sunLabel = createPlanetLabel("THE SUN", "#ffcc00");
+      sunLabel.position.set(0, 160, 0); sunLabel.scale.set(80, 20, 1); 
+      sun.add(sunLabel);
+      solarSystem.add(sun);
+
+      const sunPointLight = new THREE.PointLight(0xffaa00, 3, 2000);
+      sun.add(sunPointLight);
+
+      // --- ASTEROID BELT ---
+      const astCount = 2000;
+      const astGeo = new THREE.TetrahedronGeometry(1.5, 1);
+      const astMat = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 1.0, metalness: 0.1 });
+      const asteroidBelt = new THREE.InstancedMesh(astGeo, astMat, astCount);
+      const dummyAst = new THREE.Object3D();
+      for(let i=0; i<astCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 900 + Math.random() * 100; // Between Mars and Jupiter
+        const yOffset = (Math.random() - 0.5) * 30;
+        dummyAst.position.set(Math.cos(angle) * radius, yOffset, Math.sin(angle) * radius);
+        dummyAst.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+        const scale = Math.random() * 0.8 + 0.2;
+        dummyAst.scale.set(scale, scale, scale);
+        dummyAst.updateMatrix();
+        asteroidBelt.setMatrixAt(i, dummyAst.matrix);
+      }
+      sun.add(asteroidBelt); // Asteroids spin with the sun
+
+      // ==========================================
+      // DYNAMIC CAMERA TRACKING SETUP
+      // ==========================================
+      // We attach invisible "anchors" to the planets. As the planets orbit, these anchors move with them,
+      // and the camera builds a smooth flight path through these moving anchors!
+      const earthCamAnchor = new THREE.Object3D(); earthCamAnchor.position.set(0, 0, 35); earthGroup.add(earthCamAnchor);
+      const marsCamAnchor = new THREE.Object3D(); marsCamAnchor.position.set(0, 0, 40); mars.add(marsCamAnchor);
+      const jupCamAnchor = new THREE.Object3D(); jupCamAnchor.position.set(0, 0, 70); jupiter.add(jupCamAnchor);
+      const satCamAnchor = new THREE.Object3D(); satCamAnchor.position.set(0, 0, 70); satGroup.add(satCamAnchor);
+      const sunCamAnchor = new THREE.Object3D(); sunCamAnchor.position.set(0, 330, 800); solarSystem.add(sunCamAnchor); // Fixed above sun
+
+      // Reusable Vectors for optimal performance
+      const pCam0 = new THREE.Vector3(); const pLook0 = new THREE.Vector3();
+      const pCam1 = new THREE.Vector3(); const pLook1 = new THREE.Vector3();
+      const pCam2 = new THREE.Vector3(); const pLook2 = new THREE.Vector3();
+      const pCam3 = new THREE.Vector3(); const pLook3 = new THREE.Vector3();
+      const pCam4 = new THREE.Vector3(); const pLook4 = new THREE.Vector3();
+
+      const camPath = new THREE.CatmullRomCurve3([pCam0, pCam1, pCam2, pCam3, pCam4]);
+      const lookPath = new THREE.CatmullRomCurve3([pLook0, pLook1, pLook2, pLook3, pLook4]);
+      window.currentLookAt = new THREE.Vector3();
+
+      // ==========================================
+      // GALAXY STARS (TWINKLING), NEBULAS & METEORS
+      // ==========================================
+      // 1. Base Twinkling Stars (Split into 3 groups for staggered twinkling)
+      const stars1 = { pos: [], col: [] };
+      const stars2 = { pos: [], col: [] };
+      const stars3 = { pos: [], col: [] };
+      const color = new THREE.Color();
+
+      for(let i=0; i<3000; i++) {
+        const r = 40 + Math.random() * 800;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        const x = r * Math.sin(phi) * Math.cos(theta); 
+        const y = r * Math.sin(phi) * Math.sin(theta); 
+        const z = r * Math.cos(phi);
+        
+        const randColor = Math.random();
+        if (randColor > 0.8) color.setHex(0x00d4ff); else if (randColor > 0.6) color.setHex(0x4ecdc4); else color.setHex(0xffffff);
+        
+        let targetGroup = i % 3 === 0 ? stars1 : (i % 3 === 1 ? stars2 : stars3);
+        targetGroup.pos.push(x, y, z);
+        targetGroup.col.push(color.r, color.g, color.b);
+      }
+
+      function createStarLayer(data) {
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.Float32BufferAttribute(data.pos, 3));
+          geo.setAttribute('color', new THREE.Float32BufferAttribute(data.col, 3));
+          const mat = new THREE.PointsMaterial({ size: 0.6, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+          return new THREE.Points(geo, mat);
+      }
+
+      const particlesMesh1 = createStarLayer(stars1);
+      const particlesMesh2 = createStarLayer(stars2);
+      const particlesMesh3 = createStarLayer(stars3);
+      
+      const starField = new THREE.Group();
+      starField.add(particlesMesh1, particlesMesh2, particlesMesh3);
+      scene.add(starField);
+
+      // 2. Nebula Clouds
+      const nebCanvas = document.createElement('canvas'); nebCanvas.width = 128; nebCanvas.height = 128;
+      const nebCtx = nebCanvas.getContext('2d');
+      const nebGrad = nebCtx.createRadialGradient(64,64,0, 64,64,64);
+      nebGrad.addColorStop(0, 'rgba(0, 212, 255, 0.08)'); nebGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      nebCtx.fillStyle = nebGrad; nebCtx.fillRect(0,0,128,128);
+      const nebMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(nebCanvas), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+      
+      for(let i=0; i<40; i++) {
+         const nebula = new THREE.Sprite(nebMat);
+         const scale = 300 + Math.random() * 400; nebula.scale.set(scale, scale, 1);
+         nebula.position.set((Math.random()-0.5)*1500, (Math.random()-0.5)*800, (Math.random()-0.5)*1500 - 500);
+         scene.add(nebula);
+      }
+
+      // 3. Shooting Stars (Meteors)
+      const meteors = [];
+      for(let i=0; i<12; i++) {
+        const metGeo = new THREE.CylinderGeometry(0.05, 0.2, 12, 4); metGeo.rotateX(Math.PI/2);
+        const meteor = new THREE.Mesh(metGeo, new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending }));
+        meteor.position.set((Math.random()-0.5)*1000, (Math.random()-0.5)*500, (Math.random()-0.5)*2000 - 1000);
+        meteor.userData = { speed: Math.random() * 4 + 2 };
+        scene.add(meteor); meteors.push(meteor);
+      }
+
+      // ==========================================
+      // INTERACTIVITY: DRAG TO ROTATE & SCROLL
+      // ==========================================
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+      let targetRotation = { x: 0, y: 0 };
+      let mouseX = 0; let mouseY = 0; let scrollProgress = 0;
+
+      document.addEventListener('pointerdown', (e) => {
+        isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; document.body.style.cursor = 'grabbing';
+      });
+      document.addEventListener('pointermove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1; mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        if (isDragging) {
+          const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+          targetRotation.y += deltaMove.x * 0.005; targetRotation.x += deltaMove.y * 0.005;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+      });
+      document.addEventListener('pointerup', () => { isDragging = false; document.body.style.cursor = 'default'; });
+      
+      window.addEventListener('scroll', () => {
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        scrollProgress = Math.min(window.scrollY / (maxScroll || 1), 1);
+      });
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // ==========================================
+      // ANIMATION LOOP
+      // ==========================================
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const time = clock.getElapsedTime();
+
+        // 1. Dragging spins Earth
+        if (!isDragging) targetRotation.y += 0.001; 
+        earthGroup.rotation.y += (targetRotation.y - earthGroup.rotation.y) * 0.1;
+        earthGroup.rotation.x += (targetRotation.x - earthGroup.rotation.x) * 0.1;
+
+        // 2. Majestic Orbit Speeds! Gentle movement, dialed down the acceleration so it's not chaotic
+        let orbitSpeed = 0.0001 * (1 + scrollProgress * 2);
+        earthOrbit.rotation.y += orbitSpeed * 1.0;
+        marsOrbit.rotation.y += orbitSpeed * 1.5;
+        jupOrbit.rotation.y += orbitSpeed * 2.0;
+        satOrbit.rotation.y += orbitSpeed * 2.5;
+
+        // Rotate planets on their own axis
+        earth.rotation.y += 0.005;     // EARTH SPINS ON ITS AXIS
+        moon.rotation.y += 0.01;       // MOON SPINS ON ITS AXIS
+        moonOrbit.rotation.y += 0.008; // MOON ORBITS EARTH
+        
+        mars.rotation.y += 0.004; jupiter.rotation.y += 0.002; satGroup.rotation.y += 0.001; sun.rotation.y += 0.0005; 
+
+        // 3. Move Shooting Stars
+        meteors.forEach(m => {
+            m.position.z += m.userData.speed; m.position.x -= m.userData.speed * 0.1;
+            if(m.position.z > 200) m.position.set((Math.random()-0.5)*1000, (Math.random()-0.5)*500, -2500);
+        });
+
+        // 4. Background Galaxy, Twinkling Stars & Satellite
+        starField.rotation.y = time * 0.005; 
+        starField.rotation.x = time * 0.002;
+        
+        // Magical Twinkling Effect
+        particlesMesh1.material.opacity = 0.5 + Math.sin(time * 2.0) * 0.5;
+        particlesMesh2.material.opacity = 0.5 + Math.sin(time * 3.1) * 0.5;
+        particlesMesh3.material.opacity = 0.5 + Math.sin(time * 1.5) * 0.5;
+
+        satelliteOrbitGroup.rotation.y = (time * 0.15) + (scrollProgress * Math.PI * 2); // Dialed down satellite scroll spin
+        satellite.rotation.x = time * 0.5; satellite.rotation.z = Math.sin(time * 0.5) * 0.2;
+
+        // 5. UPDATE DYNAMIC CAMERA PATH
+        // We get the actual live world positions of every planet in their current orbit
+        earthCamAnchor.getWorldPosition(pCam0); earthGroup.getWorldPosition(pLook0);
+        marsCamAnchor.getWorldPosition(pCam1); mars.getWorldPosition(pLook1);
+        jupCamAnchor.getWorldPosition(pCam2); jupiter.getWorldPosition(pLook2);
+        satCamAnchor.getWorldPosition(pCam3); satGroup.getWorldPosition(pLook3);
+        sunCamAnchor.getWorldPosition(pCam4); sun.getWorldPosition(pLook4);
+
+        // Fetch the point on our dynamic curve based on scroll progress
+        const targetCamPos = camPath.getPointAt(scrollProgress);
+        const targetLookPos = lookPath.getPointAt(scrollProgress);
+
+        // Apply mouse parallax to the camera
+        targetCamPos.x += mouseX * 2; targetCamPos.y += mouseY * 2;
+
+        // Smoothly glide camera to the moving targets
+        camera.position.lerp(targetCamPos, 0.05);
+        window.currentLookAt.lerp(targetLookPos, 0.05);
+        camera.lookAt(window.currentLookAt);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    // ── 2. INTERSECTION OBSERVER (FADE ANIMATIONS) ──
+    (function scrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    })();
+
+    // ── 3. HAMBURGER MENU ──
+    document.getElementById('hamburger').addEventListener('click', function() {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+      });
+    });
+
+    // ── 4. SMOOTH SCROLL FOR NAV ──
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // ── 5. EMAIL COPY ──
+    document.getElementById('emailBtn').addEventListener('click', function() {
+      const email = 'bhogejayesh@gmail.com';
+      navigator.clipboard.writeText(email).then(() => {
+        const orig = this.textContent;
+        this.textContent = 'Copied! ✓';
+        setTimeout(() => {
+          this.textContent = orig;
+        }, 2000);
+      });
+    });
+
+    // ── 6. CONTACT FORM (Connected to Formspree via AJAX) ──
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = this;
+      const btn = form.querySelector('.submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      const data = new FormData(form);
+      const actionUrl = form.getAttribute('action');
+
+      try {
+        const response = await fetch(actionUrl, {
+          method: 'POST',
+          body: data,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          btn.textContent = '✓ Message Sent!';
+          form.reset(); // Clear the form fields
+        } else {
+          // If you haven't replaced the endpoint URL yet, it will fail gracefully
+          btn.textContent = '❌ Setup Required';
+          console.error("Formspree endpoint not configured.");
+        }
+      } catch (error) {
+        btn.textContent = '❌ Network Error';
+      }
+
+      // Reset button state after 3 seconds
+      setTimeout(() => {
+        btn.textContent = 'Submit';
+        btn.disabled = false;
+      }, 3000);
+    });
+
+    // ── 7. CLOSE NAV ON SCROLL (mobile) ──
+    window.addEventListener('scroll', () => {
+      const links = document.getElementById('navLinks');
+      if (links.classList.contains('open') && window.innerWidth <= 768) {
+        links.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>
